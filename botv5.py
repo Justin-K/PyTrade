@@ -8,7 +8,7 @@ from traceback import print_exc
 from os import system
 from ccxt.base.errors import NetworkError
 from random import choice
-class Bot:
+class TradingBot:
 	def __init__(self, client_obj, conf_file):
 		with open(conf_file, "r") as f:
 			d = load(f)
