@@ -143,7 +143,7 @@ class Interface:
 		while True:
 			if self.clock_sync_event.is_set():
 				break
-			system("echo 15234rq | sudo -S service ntp stop && echo 15234rq | sudo -S ntpd -gq > /dev/null && echo 15234rq | sudo -S service ntp start")
+			system("echo xxxxxxxx | sudo -S service ntp stop && echo xxxxxxxx | sudo -S ntpd -gq > /dev/null && echo xxxxxxxx | sudo -S service ntp start")
 			self.clock_sync_event.wait(self.clock_sync_interval*60) # convert to minutes
 	def createNewBot(self, config_file, _name, run_on_creation=False): # NAMES CANNOT BE THE SAME!!!!!!
 		x = Bot(self.client, config_file)#change depending on subclass
