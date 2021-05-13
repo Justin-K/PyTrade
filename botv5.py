@@ -70,7 +70,7 @@ class Bot:
 		return {"price" : D(x["price"]), "amount" : D(x["amount"])}
 	def tick(self):
 		price = D(self.c.fetchTicker(self.pair)["last"])# defined for one execution cycle
-		if (not self.c.fetchOpenOrders(self.pair)) and (self.trade_min<=price<=self.trade_max):
+		if (not self.c.fetchOpenOrders(self.pair)):
 			if self.last_sell_id:
 				sell_order = self.stripTradeStruct(self.last_sell_id)
 				self.num_sells += 1
@@ -80,7 +80,7 @@ class Bot:
 				self.log(f"[INFO] Sell order for {round(sell_order['amount'], 8)} {self.asset} at {round(sell_order['price'], 8)} {self.base_asset} filled.\n")
 				self.log(f"[INFO] Entering {self.cooldown} second cooldown.\n")
 				self.event.wait(self.cooldown)
-			else:
+			elif (self.trade_min<=price<=self.trade_max):
 				self.gasUp()
 				buy_ord = self.c.createMarketBuyOrder(self.pair, self.qty)
 				buy_price = self.stripTradeStruct(buy_ord["id"])["price"]
