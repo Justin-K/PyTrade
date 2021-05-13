@@ -1,4 +1,4 @@
-from decimal import Decimal as D
+from decimal import Decimal
 from time import sleep
 from datetime import datetime
 from json import load
@@ -9,12 +9,13 @@ from os import system
 from ccxt.base.errors import NetworkError
 from random import choice
 class TradingBot:
+
 	def __init__(self, client_obj, conf_file):
 		with open(conf_file, "r") as f:
 			d = load(f)
 		self.c = client_obj
-		self.take_profit = D(d["take_profit"])
-		self.qty = D(d["quantity"])
+		self.take_profit = Decimal(d["take_profit"])
+		self.qty = Decimal(d["quantity"])
 		self.asset = d["asset"] 
 		self.base_asset = d["base_asset"]
 		self.pair = self.asset + "/" +self.base_asset
@@ -25,10 +26,10 @@ class TradingBot:
 		self.cooldown = (d["cooldown"])
 		self.config_file = conf_file
 		self.precison = d["precison"]
-		self.taker_fee = D(d["taker_fee"])
-		self.maker_fee = D(d["maker_fee"])
+		self.taker_fee = Decimal(d["taker_fee"])
+		self.maker_fee = Decimal(d["maker_fee"])
 		self.logging_enabled = d["logging_enabled"]
-		self.gas = D(d["kcs_for_gas"])
+		self.gas = Decimal(d["kcs_for_gas"])
 		self.gas_up_enabled = d["buy_kcs_automatically"]
 		self.ttp = d["trailing_take_profit_enabled"]
 		self.trailing_deviation = d["trailing_deviation"]
@@ -37,12 +38,14 @@ class TradingBot:
 		self.last_sell_id, self.name, self.start_time = "", "", ""
 		self.num_buys, self.num_sells, self.total_gains, self.potential_gain = 0, 0, 0, 0
 		self.event = Event()
+
 	def log(self, x):
 		if self.logging_enabled:
 			d = datetime.now()
 			timestamp = d.strftime("%m/%d/%Y %H:%M:%S")
 			with open(self.log_file, "a") as f:
 				f.write(f"[{timestamp}] {x}")
+
 	def updateConfig(self):
 		tmp = [self.last_sell_id, self.num_sells, self.num_buys, self.total_gains, self.potential_gain, self.name, self.start_time, self.event]
 		self.__init__(self.c, self.config_file)
@@ -55,21 +58,26 @@ class TradingBot:
 		self.start_time = tmp[6]
 		self.event = tmp[7]
 		self.log("[INFO] Config updated\n")
+
 	def gasUp(self):
 		#self.gas -- represents the number to compare to KCS balance to see if balance is too low and the quantity of KCS to buy.
-		if D(self.c.fetchBalance()["KCS"]["free"]) < D(self.gas) and self.gas_up_enabled:
+		if Decimal(self.c.fetchBalance()["KCS"]["free"]) < Decimal(self.gas) and self.gas_up_enabled:
 			self.log("[WARNING] KCS balance is too low to pay for maker or taker fees. Attempting to trade for more...\n")
 			buy_ord = self.c.createMarketBuyOrder("KCS/BTC", self.gas)
 			self.log(f'[INFO] {buy_ord["amount"]} KCS bought.\n')
+
 	def mkSellPrice(self, buy_price, percent_profit): # ((gain_offset + fee_offset) * buy_price) + buy_price
-		return ((((percent_profit/D(100))+((self.maker_fee+self.taker_fee)/D(100)))*buy_price)+buy_price)
+		return ((((percent_profit/Decimal(100))+((self.maker_fee+self.taker_fee)/Decimal(100)))*buy_price)+buy_price)
+
 	def profitLoss(self, buy_price, sell_price, qty): # (sell_price - buy_price) * qty
-		return ((D(sell_price) - D(buy_price))*(D(qty)))
+		return ((Decimal(sell_price) - Decimal(buy_price))*(Decimal(qty)))
+
 	def stripTradeStruct(self, _id):
 		x = self.c.fetchOrder(_id)
-		return {"price" : D(x["price"]), "amount" : D(x["amount"])}
+		return {"price" : Decimal(x["price"]), "amount" : Decimal(x["amount"])}
+
 	def tick(self):
-		price = D(self.c.fetchTicker(self.pair)["last"])# defined for one execution cycle
+		price = Decimal(self.c.fetchTicker(self.pair)["last"])# defined for one execution cycle
 		if (not self.c.fetchOpenOrders(self.pair)):
 			if self.last_sell_id:
 				sell_order = self.stripTradeStruct(self.last_sell_id)
@@ -93,6 +101,7 @@ class TradingBot:
 				sell_ord = self.c.createLimitSellOrder(self.pair, round(self.qty, 8), round(sell_price, self.precison))
 				self.last_sell_id = sell_ord["id"]
 				self.log(f"[INFO] Posted limit-sell order for {round(self.qty, 8)} {self.asset} at {round(sell_price, 8)} {self.base_asset}.\n")
+
 	def run(self):
 		def logError(msg, fname):
 			self.log(f"[ERROR] {msg}.\n")
@@ -114,44 +123,55 @@ class TradingBot:
 		self.log(f"Sells: {self.num_sells}\n")
 		self.log(f"Total estimated gains: {round(self.total_gains, 8)}\n")
 		self.log("[INFO] Bot Stopped\n")
+
 	def stop(self):
 		self.event.set()
+
 class Interface:
+
 	def __init__(self, api, api_secret, passphrase):
 		self.threads, self.bot_instances = [], []
 		self.clock_sync_interval = 60.0 # interpreted as minutes
 		self.clock_sync_event = Event()
 		self.client = kucoin({"apiKey" : api, "secret" : api_secret, "password" : passphrase})
+
 	def createThread(self, fnct, name_of_thread, start_on_creation=False, d=False): #returns position of created thread
 		self.threads.append(Thread(target=fnct, daemon=d, name=name_of_thread))
 		if start_on_creation:
 			self.threads[(len(self.threads)-1)].start()
 		return len(self.threads)-1
+
 	def removeThread(self, i): # removeThread and startThread both return true if the respective function was able to succeed in its task
 		if not self.threads[i].is_alive():
 			self.threads.remove(self.threads[i])
 			return True
 		else:return False
+
 	def startThread(self, i):
 		if not self.threads[i].is_alive():
 			self.threads[i].start()
 			return True
 		else:return False
+
 	def stopClockSyncTask(self):
 		self.clock_sync_event.set()
+
 	def ntpSync(self):
 		while True:
 			if self.clock_sync_event.is_set():
 				break
 			system("echo xxxxxxxx | sudo -S service ntp stop && echo xxxxxxxx | sudo -S ntpd -gq > /dev/null && echo xxxxxxxx | sudo -S service ntp start")
 			self.clock_sync_event.wait(self.clock_sync_interval*60) # convert to minutes
+
 	def createNewBot(self, config_file, _name, run_on_creation=False): # NAMES CANNOT BE THE SAME!!!!!!
 		x = Bot(self.client, config_file)#change depending on subclass
 		x.name = _name
 		pos = self.createThread(x.run,  _name, start_on_creation=run_on_creation, d=True)
 		self.bot_instances.append([x, pos])
+
 	def findBot(self, n):
 		return int([self.bot_instances.index(i) for i in self.bot_instances if i[0].name == n][0])
+
 	def status(self):
 		if self.threads:
 			print("----------Worker Thread Status----------")
@@ -160,6 +180,7 @@ class Interface:
 				print(f"Status: {('Running' if i.is_alive() else 'Stopped')}")
 		else:
 			print("No worker threads created")
+
 	def makeReport(self, fname, i):
 		runtime = None
 		with open(fname, "w") as f:
@@ -177,6 +198,7 @@ class Interface:
 			with open(self.bot_instances[i][0].config_file, "r") as y:
 				for i in y:
 					f.write(i)
+					
 	def main(self):
 		usr_in = input("/BotInterface/--> ")
 		if usr_in == "status":
