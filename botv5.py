@@ -163,7 +163,7 @@ class Interface:
 	def makeReport(self, fname, i):
 		runtime = None
 		with open(fname, "w") as f:
-			with open(choice(["banner1.txt", "banner2.txt", "banner3.txt"]), "r") as x:
+			with open(choice(["banners/banner1.txt", "banners/banner2.txt", "banners/banner3.txt"]), "r") as x:
 				for ln in x:
 					f.write(ln)       
 			f.write("\nTime of generation: {0}\n".format(datetime.now().strftime("%m/%d/%Y %H:%M:%S")))
