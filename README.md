@@ -1,2 +1,2 @@
 # Trading_Bot
-Automated trader written in Python.
+An automated trading bot written in Python. Base version inlcudes a CLI interface.
