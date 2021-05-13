@@ -251,6 +251,3 @@ class Interface:
 		else:
 			print("Unrecognized command")
 			self.main()
-class WebInterface(Interface):
-	def main(self):
-		pass
