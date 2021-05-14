@@ -164,7 +164,7 @@ class Interface:
 			self.clock_sync_event.wait(self.clock_sync_interval*60) # convert to minutes
 
 	def createNewBot(self, config_file, _name, run_on_creation=False): # NAMES CANNOT BE THE SAME!!!!!!
-		x = Bot(self.client, config_file)#change depending on subclass
+		x = TradingBot(self.client, config_file)#change depending on subclass
 		x.name = _name
 		pos = self.createThread(x.run,  _name, start_on_creation=run_on_creation, d=True)
 		self.bot_instances.append([x, pos])
