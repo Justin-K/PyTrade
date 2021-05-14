@@ -172,7 +172,7 @@ class Interface:
 	def findBot(self, n):
 		return int([self.bot_instances.index(i) for i in self.bot_instances if i[0].name == n][0])
 
-	def status(self):
+	def _status(self):
 		if self.threads:
 			print("----------Worker Thread Status----------")
 			for i in self.threads:
@@ -198,65 +198,32 @@ class Interface:
 			with open(self.bot_instances[i][0].config_file, "r") as y:
 				for i in y:
 					f.write(i)
-					
-	def main(self):
-		usr_in = input("/BotInterface/--> ")
-		if usr_in == "status":
-			self.status()
-			self.main()
-		elif usr_in == "start bot":
-			bot = input("Enter name of bot to start: ")
-			self.bot_instances[self.findBot(bot)][0].start_time = datetime.now()
-			self.threads[self.bot_instances[self.findBot(bot)][1]].start()
-			self.main()
-		elif usr_in == "start all":
-			for i in self.bot_instances:i[0].start_time = datetime.now()
+	def _startBot(self):
+		bot = input("Enter name of bot to start: ")
+		self.bot_instances[self.findBot(bot)][0].start_time = datetime.now()
+		self.threads[self.bot_instances[self.findBot(bot)][1]].start()
+	def _startAll(self):
+		for i in self.bot_instances:i[0].start_time = datetime.now()
 			for i in self.threads:
 				if i.name != "clock_sync":
 					self.startThread(self.threads.index(i))
 					sleep(5)
-			self.main()
-		elif usr_in == "help":
-			print("start bot\nstart all\nstop all\nstart ntp_sync\nstop ntp_sync\nset sync_interval\ngenerate bot report\ngenerate all\ncreate bot\nstop bot\nstop all\nupdate bot config\nupdate all\nquit")
-			self.main()
-		elif usr_in == "start ntp_sync":
-			self.createThread(self.ntpSync, "clock_sync", start_on_creation=True, d=True)
-			self.main()
-		elif usr_in == "stop ntp_sync":
-			self.stopClockSyncTask()
-			self.main()
-		elif usr_in == "set sync_interval":
-			self.clock_sync_interval = float(input("Enter new interval in minutes: "))
-			self.main()
-		elif usr_in == "create bot":
-			name = input("Enter a name for the new bot: ")
-			config_file = input("Enter name of the configuration file to use: ")
-			self.createNewBot(config_file, name)
-			self.main()
-		elif usr_in == "stop bot":
-			bot = input("Enter name of bot to stop: ")
-			self.bot_instances[self.findBot(bot)][0].stop()
-			self.main()
-		elif usr_in == "stop all":
-			for i in self.bot_instances:i[0].stop()
-			self.main()
-		elif usr_in == "update bot config":
-			bot = input("Enter name of bot to update: ")
-			self.bot_instances[self.findBot(bot)][0].updateConfig()
-			self.main()
-		elif usr_in == "update all":
-			for i in self.bot_instances:i[0].updateConfig()
-			self.main()
-		elif usr_in == "generate bot report":
-			bot = input("Enter name of bot: ")
-			pos = self.findBot(bot)
-			self.makeReport(self.bot_instances[pos][0].name+".txt", pos)
-			self.main()
-		elif usr_in == "generate all":
-			for i in self.bot_instances:self.makeReport(i[0].name+".txt", self.bot_instances.index(i))
-			self.main()
-		elif usr_in == "exit" or usr_in == "quit":
-			if not self.threads and not self.bot_instances:
+	def _createBot(self):
+		name = input("Enter a name for the new bot: ")
+		config_file = input("Enter name of the configuration file to use: ")
+		self.createNewBot(config_file, name)
+	def _stopBot(self):
+		bot = input("Enter name of bot to stop: ")
+		self.bot_instances[self.findBot(bot)][0].stop()
+	def _updateBotConfig(self):
+		bot = input("Enter name of bot to update: ")
+		self.bot_instances[self.findBot(bot)][0].updateConfig()
+	def _generateBotReport(self):
+		bot = input("Enter name of bot: ")
+		pos = self.findBot(bot)
+		self.makeReport(self.bot_instances[pos][0].name+".txt", pos)
+	def _safeExit():
+		if not self.threads and not self.bot_instances:
 				exit(0)
 			else:
 				exitflag = None
@@ -270,6 +237,27 @@ class Interface:
 					self.main()
 				else:
 					exit(0)
-		else:
-			print("Unrecognized command")
-			self.main()
+	def switch(self, arg):
+		switcher = {
+		"status" : self._status,
+		"start bot" : self._startBot,
+		"start all" : self._startAll,
+		"help" : print("start bot\nstart all\nstop all\nstart ntp_sync\nstop ntp_sync\nset sync_interval\ngenerate bot report\ngenerate all\ncreate bot\nstop bot\nstop all\nupdate bot config\nupdate all\nquit"),
+		"start ntp_sync" : self.createThread(self.ntpSync, "clock_sync", start_on_creation=True, d=True),
+		"stop ntp_sync" : self.stopClockSyncTask,
+		"set sync_interval" : self.clock_sync_interval = float(input("Enter new interval in minutes: ")),
+		"create bot" : self._createBot,
+		"stop bot" : self._stopBot,
+		"stop all" : [i[0].stop() for i in self.bot_instances],
+		"update bot config" : self._updateBotConfig,
+		"update all" : [i[0].updateConfig() for i in self.bot_instances],
+		"generate bot report" : self._generateBotReport,
+		"generate all" : [self.makeReport(i[0].name+".txt", self.bot_instances.index(i)) for i in self.bot_instances],
+		"exit" : self._safeExit,
+		"quit" : self._safeExit
+		}
+		return switcher.get(arg, "Unrecognized command.")
+	def main(self):
+		usr_in = input("/BotInterface/--> ")
+		self.switch(usr_in)
+		self.main()
