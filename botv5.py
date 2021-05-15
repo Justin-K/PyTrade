@@ -250,7 +250,7 @@ class Interface:
 				else:
 					self.removeThread(self.threads.index(i))
 			if exitflag == False:
-				print("One or more threads are still alive")
+				print("One or more threads are still alive.")
 				self.main()
 			else:
 				exit(0)
