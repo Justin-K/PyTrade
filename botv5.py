@@ -6,8 +6,10 @@ from ccxt import kucoin
 from threading import Thread, Event
 from traceback import print_exc
 from os import system
+from os import name as PLATFORM
 from ccxt.base.errors import NetworkError
 from random import choice
+LINUX, WINDOWS = "posix", "nt"
 class TradingBot:
 
 	def __init__(self, client_obj, conf_file):
@@ -153,15 +155,18 @@ class Interface:
 			return True
 		else:return False
 
-	def stopClockSyncTask(self):
+	def _stopClockSyncTask(self):
 		self.clock_sync_event.set()
 
 	def ntpSync(self):
-		while True:
-			if self.clock_sync_event.is_set():
-				break
-			system("echo xxxxxxxx | sudo -S service ntp stop && echo xxxxxxxx | sudo -S ntpd -gq > /dev/null && echo xxxxxxxx | sudo -S service ntp start")
-			self.clock_sync_event.wait(self.clock_sync_interval*60) # convert to minutes
+		if PLATFORM == LINUX:
+			while True:
+				if self.clock_sync_event.is_set():
+					break
+				system("echo xxxxxxxx | sudo -S service ntp stop && echo xxxxxxxx | sudo -S ntpd -gq > /dev/null && echo xxxxxxxx | sudo -S service ntp start")
+				self.clock_sync_event.wait(self.clock_sync_interval*60) # convert to minutes
+		else:
+			print("Unable to start the ntp sync task; platfrom is not Linux.")
 
 	def createNewBot(self, config_file, _name, run_on_creation=False): # NAMES CANNOT BE THE SAME!!!!!!
 		x = TradingBot(self.client, config_file)#change depending on subclass
@@ -179,7 +184,7 @@ class Interface:
 				print(f"Name: {i.name}", end=" | ")
 				print(f"Status: {('Running' if i.is_alive() else 'Stopped')}")
 		else:
-			print("No worker threads created")
+			print("No worker threads created.")
 
 	def makeReport(self, fname, i):
 		runtime = None
@@ -198,78 +203,80 @@ class Interface:
 			with open(self.bot_instances[i][0].config_file, "r") as y:
 				for i in y:
 					f.write(i)
-					
-	def main(self):
-		usr_in = input("/BotInterface/--> ")
-		if usr_in == "status":
-			self.status()
-			self.main()
-		elif usr_in == "start bot":
-			bot = input("Enter name of bot to start: ")
-			self.bot_instances[self.findBot(bot)][0].start_time = datetime.now()
-			self.threads[self.bot_instances[self.findBot(bot)][1]].start()
-			self.main()
-		elif usr_in == "start all":
-			for i in self.bot_instances:i[0].start_time = datetime.now()
-			for i in self.threads:
-				if i.name != "clock_sync":
-					self.startThread(self.threads.index(i))
-					sleep(5)
-			self.main()
-		elif usr_in == "help":
-			print("start bot\nstart all\nstop all\nstart ntp_sync\nstop ntp_sync\nset sync_interval\ngenerate bot report\ngenerate all\ncreate bot\nstop bot\nstop all\nupdate bot config\nupdate all\nquit")
-			self.main()
-		elif usr_in == "start ntp_sync":
-			self.createThread(self.ntpSync, "clock_sync", start_on_creation=True, d=True)
-			self.main()
-		elif usr_in == "stop ntp_sync":
-			self.stopClockSyncTask()
-			self.main()
-		elif usr_in == "set sync_interval":
-			self.clock_sync_interval = float(input("Enter new interval in minutes: "))
-			self.main()
-		elif usr_in == "create bot":
-			name = input("Enter a name for the new bot: ")
-			config_file = input("Enter name of the configuration file to use: ")
-			self.createNewBot(config_file, name)
-			self.main()
-		elif usr_in == "stop bot":
-			bot = input("Enter name of bot to stop: ")
-			self.bot_instances[self.findBot(bot)][0].stop()
-			self.main()
-		elif usr_in == "stop all":
-			for i in self.bot_instances:i[0].stop()
-			self.main()
-		elif usr_in == "update bot config":
-			bot = input("Enter name of bot to update: ")
-			self.bot_instances[self.findBot(bot)][0].updateConfig()
-			self.main()
-		elif usr_in == "update all":
-			for i in self.bot_instances:i[0].updateConfig()
-			self.main()
-		elif usr_in == "generate bot report":
-			bot = input("Enter name of bot: ")
-			pos = self.findBot(bot)
-			self.makeReport(self.bot_instances[pos][0].name+".txt", pos)
-			self.main()
-		elif usr_in == "generate all":
-			for i in self.bot_instances:self.makeReport(i[0].name+".txt", self.bot_instances.index(i))
-			self.main()
-		elif usr_in == "exit" or usr_in == "quit":
-			if not self.threads and not self.bot_instances:
-				exit(0)
-			else:
-				exitflag = None
-				for i in self.threads:
-					if i.is_alive():
-						exitflag = False
-					else:
-						self.removeThread(self.threads.index(i))
-				if exitflag == False:
-					print("One or more threads are still alive")
-					self.main()
-				else:
-					exit(0)
+
+
+	def _startBot(self):
+		bot = input("Enter name of bot to start: ")
+		self.bot_instances[self.findBot(bot)][0].start_time = datetime.now()
+		self.threads[self.bot_instances[self.findBot(bot)][1]].start()
+
+	def _startAll(self):
+		if not self.bot_instances:
+			print("No bots to start.")
+		for i in self.bot_instances:
+			i[0].start_time = datetime.now()
+		for i in self.threads:
+			if i.name != "clock_sync":
+				self.startThread(self.threads.index(i))
+				sleep(5)
+
+	def _setInterval(self):
+		self.clock_sync_interval = float(input("Enter new interval in minutes: "))
+
+	def _createBot(self):
+		self.createNewBot(input("Enter name of the configuration file to use: "), input("Enter a name for the new bot: "))
+
+	def _stopBot(self):
+		bot = input("Enter name of bot to stop: ")
+		self.bot_instances[self.findBot(bot)][0].stop()
+
+	def _updateConfig(self):
+		bot = input("Enter name of bot to update: ")
+		self.bot_instances[self.findBot(bot)][0].updateConfig()
+
+	def _generateReport(self):
+		bot = input("Enter name of bot: ")
+		pos = self.findBot(bot)
+		self.makeReport(self.bot_instances[pos][0].name+".txt", pos)
+
+	def _safeExit(self):
+		if not self.threads and not self.bot_instances:
+			exit(0)
 		else:
-			print("Unrecognized command")
-			self.main()
+			exitflag = None
+			for i in self.threads:
+				if i.is_alive():
+					exitflag = False
+				else:
+					self.removeThread(self.threads.index(i))
+			if exitflag == False:
+				print("One or more threads are still alive")
+				self.main()
+			else:
+				exit(0)
+
+	def _switch(self, arg):	
+		switcher = {
+			"start bot" : self._startBot,
+			"status" : self.status,
+			"start all" : self._startAll,
+			"help" : lambda: print("start bot\nstart all\nstop all\nstart ntp_sync\nstop ntp_sync\nset sync_interval\ngenerate report\ngenerate all\ncreate bot\nstop bot\nstop all\nupdate config\nupdate all\nquit"),
+			"start ntp_sync" : lambda: self.createThread(self.ntpSync, "clock_sync", start_on_creation=True, d=True),
+			"stop ntp_sync" : self._stopClockSyncTask,
+			"set sync_interval" : self._setInterval,
+			"create bot" : self._createBot,
+			"stop bot" : self._stopBot,
+			"stop all" : lambda: [_[0].stop() for _ in self.bot_instances], # _ is the standard Python naming convention for iterators that aren't used beyond 1 line. I also believe a list comp. here is better than another helper function.
+			"update config" : self._updateConfig,
+			"update all" : lambda: [_[0].updateConfig() for _ in self.bot_instances],
+			"generate report" : self._generateReport,
+			"generate all" : lambda: [self.makeReport(_[0].name+".txt", self.bot_instances.index(_)) for _ in self.bot_instances],
+			"exit" : self._safeExit,
+			"quit" : self._safeExit
+		}
+		switcher[arg]() if arg in switcher.keys() else print("Unrecognized command.")
+
+	def main(self):
+		usr_in = input("/PyTrade/--> ")
+		self._switch(usr_in)
+		self.main()
