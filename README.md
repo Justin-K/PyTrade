@@ -1,0 +1,2 @@
+# PyTrade
+A cryptocurrency trading framework written in Python that will allow users to define, run, and manage their own trading strategies. It is currently under heavy development and will be for the considerable future. I intend to create a web interface and/or a GUI for CRUD operations in the future as well. I will also use MongoDB to store configurations, API credintials, and records of trades.  
