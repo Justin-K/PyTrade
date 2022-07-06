@@ -1,5 +1,5 @@
 from ccxt import Exchange
-from errors import *
+from errors import ValidationException, AuthenticationException
 from trade import Trade
 
 
@@ -64,7 +64,7 @@ class BaseStrategy:
     def tick(self):
         raise NotImplementedError("This method must be overridden in the derived class.")
 
-    def updateConfig(self):
+    def updateConfig(self, new_config, new_market=None, new_api=None):
         raise NotImplementedError("This method must be overridden in the derived class.")
 
     def onTradeCompletion(self, finished_trade: Trade):
