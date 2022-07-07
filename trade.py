@@ -2,7 +2,7 @@ from function_library import profitLoss, ms_to_s, from_utc_timestamp_to_local_da
 
 
 class Trade:
-
+    # a trade (hypothetically at least) is defined by 2 orders: a buy order and a sell order
     def __init__(self, symbol: str, quantity):
         self.symbol = symbol.upper()
         self.quantity = quantity
@@ -10,7 +10,8 @@ class Trade:
         self.time_sold_utc = None
         self.buy_price = None
         self.sell_price = None
-        self.order_id = None
+        self.buy_order_id = None
+        self.sell_order_id = None
 
     @property
     def profit(self):

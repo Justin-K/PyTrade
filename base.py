@@ -73,6 +73,9 @@ class BaseStrategy:
     def onTradeStart(self, in_progress_trade: Trade):
         raise NotImplementedError("This method must be overridden in the derived class.")
 
+    def run(self):
+        raise NotImplementedError("This method must be overridden in the derived class.")
+
 
 if __name__ == "__main__":
     pass
