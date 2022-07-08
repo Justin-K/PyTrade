@@ -27,6 +27,5 @@ sandbox_api.password = ''
 
 
 
-# strategy = SimpleSpotStrategy(config, market, sandbox_api)
-# strategy.authenticate(is_sandbox=True)
-# strategy.tick()
+strategy = SimpleSpotStrategy(config, market, sandbox_api)
+strategy.run()

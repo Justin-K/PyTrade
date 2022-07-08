@@ -1,6 +1,7 @@
 from ccxt import Exchange
 from errors import ValidationException, AuthenticationException
 from trade import Trade
+from enum import Enum
 
 
 class Market:
@@ -75,6 +76,16 @@ class BaseStrategy:
 
     def run(self):
         raise NotImplementedError("This method must be overridden in the derived class.")
+
+    def stop(self):
+        raise NotImplementedError("This method must be overridden in the derived class.")
+
+
+class State(Enum):
+    STOPPED = "The strategy is currently not running."
+    RUNNING = "The strategy is currently running."
+    ERROR = "The strategy encountered an error."
+    WAITING = "The strategy is currently awaiting a start condition."
 
 
 if __name__ == "__main__":

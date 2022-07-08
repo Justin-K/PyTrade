@@ -1,6 +1,9 @@
-from base import BaseStrategy
+from base import BaseStrategy, State
 from trade import Trade
+from ccxt.base.errors import NetworkError
 from function_library import calculatePrice, average, s_to_ms
+from time import sleep
+from threading import Event
 
 
 class SimpleSpotStrategy(BaseStrategy):
@@ -8,6 +11,8 @@ class SimpleSpotStrategy(BaseStrategy):
     def __init__(self, user_config, market, api):
         super().__init__(user_config, market, api)
         self.trade = Trade(self.market.symbol, self.config.quantity)
+        self.event = Event()
+        self.state = State.STOPPED
 
     def authenticate(self, is_sandbox=False):
         self.config.client = self.api_credentials.authenticateClient(sandbox_api=is_sandbox)
@@ -20,33 +25,7 @@ class SimpleSpotStrategy(BaseStrategy):
         # ensure that the config is good (no empty values)
 
     def tick(self):
-        price = self.config.client.fetchTicker(self.market.symbol)["last"]
-        if self.trade.sell_order_id:
-            pass
-            # last_order = self.config.client.fetchOrder(self.trade.order_id)
-            # if last_order["status"] == "closed":
-            #     # we've filled a sell-order (aka completed a trade)
-            #     now = self.config.client.milliseconds()
-            #     utc_sold_time = now - s_to_ms(self.config.time_between_ticks)  # an approximation
-            #     self.trade.time_sold_utc = utc_sold_time
-            #     # determine and assign self.trade.sell_price here (i think??)
-            #     self.trade.sell_price = self.config.client.fetchOrder(self.trade.order_id)["price"]
-            #     self.onTradeCompletion(self.trade)
-            #     # put thread to sleep here (self.config.time_between_ticks)
-            # elif last_order["status"] in ["canceled", "expired", "rejected"]:
-            #     raise Exception("The order has since been canceled, rejected, or it expired.")
-        else:
-            pass
-            # if self.config.trade_min < price < self.config.trade_max:
-            #     buy_order = self.config.client.createMarketBuyOrder(self.market.symbol, self.config.quantity)
-            #     utc_buy_time = self.config.client.milliseconds()
-            #     buy_price = buy_order["price"] if buy_order["price"] else buy_order["average"]
-            #     # put thread to sleep here to allow the order to fill
-            #     self.trade.time_bought_utc = average([utc_buy_time, buy_order["timestamp"]])
-            #     self.trade.buy_price = buy_price
-            #     self.trade.buy_order_id = buy_order["id"]
-            #     # submit new limit-sell order here
-            #     self.onTradeStart(self.trade)
+        pass
 
     def onTradeStart(self, in_progress_trade: Trade):
         # register the new trade to be handled/monitored?
@@ -58,7 +37,34 @@ class SimpleSpotStrategy(BaseStrategy):
 
     def updateConfig(self, new_config, new_market=None, new_api=None):
         # give the user a way to change the config object (and the Market object as well) while the strategy is running
-        pass
+        self.config = new_config
+        if new_market:
+            self.market = new_market
+        if new_api:
+            self.api_credentials = new_api
+
+    def run(self):
+        self.validate()
+        self.state = State.RUNNING
+        while not self.event.is_set():
+            try:
+                self.tick()
+                self.event.wait(self.config.time_between_ticks)
+            except NetworkError:
+                pass
+            except Exception as e:
+                self.state = State.ERROR
+                # handle error here
+                raise e
+        self.state = State.STOPPED
+
+    def stop(self):
+        self.event.set()
+
+    # def reset(self):
+    #     self.event.clear()
+
+
 
 
 # implement a grid-like strategy (used to kill volatility)
