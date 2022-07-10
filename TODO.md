@@ -5,8 +5,11 @@
   - [ ] Complete the onTradeStart() method
   - [ ] Complete the onTradeComplete() method
   - [ ] Test the restart() method
+  - [ ] Test the update() method
+  - [ ] Complete the tick() method
+  - [ ] Test the tick() method
+  - [ ] Make sure that the code in SimpleSpotStrategy.validate() shouldn't be in the validate() method of BaseStrategy
 - [ ] Integrate MongoDB into the project
-- [ ] Make sure that the code in SimpleSpotStrategy.validate() shouldn't be in the validate() method of BaseStrategy
 
 ### Completed
 - [x] Complete the updateConfig() method of SimpleSpotStrategy.

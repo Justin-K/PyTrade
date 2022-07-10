@@ -72,7 +72,7 @@ class BaseStrategy:
     def tick(self):
         raise NotImplementedError("This method must be overridden in the derived class.")
 
-    def updateConfig(self, new_config, new_market=None, new_api=None):
+    def update(self, new_config, new_market=None, new_api=None):
         raise NotImplementedError("This method must be overridden in the derived class.")
 
     def onTradeComplete(self, finished_trade: Trade):

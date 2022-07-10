@@ -41,7 +41,7 @@ class SimpleSpotStrategy(BaseStrategy):
         self.trade = Trade(self.market.symbol, self.config.quantity)
         # log the finished trade in a db, pass off to a Reporter-type class, or both!
 
-    def updateConfig(self, new_config, new_market=None, new_api=None):
+    def update(self, new_config, new_market=None, new_api=None):
         # give the user a way to change the config object (and the Market object as well) while the strategy is running
         self.config = new_config
         if new_market:
