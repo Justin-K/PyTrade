@@ -11,6 +11,7 @@ config.time_between_ticks = 30
 config.take_profit = 0.5
 config.trade_min = 15000
 config.trade_max = 25000
+config.cooldown_period = 30
 
 market = Market("BTC/USDT")
 market.setMarket(config.client)
@@ -26,7 +27,6 @@ sandbox_api.api_secret = ""
 sandbox_api.password = ''
 
 
-
-strategy = SimpleSpotStrategy(config, market, sandbox_api)
-strategy.authenticate(True)
-strategy.validate()
+# strategy = SimpleSpotStrategy(config, market, sandbox_api)
+# strategy.authenticate(True)
+# strategy.validate()

@@ -7,3 +7,4 @@ class SimpleSpotStrategyConfig(BaseUserConfig):
         super().__init__()
         self.trade_min = None
         self.trade_max = None
+        self.cooldown_period = None

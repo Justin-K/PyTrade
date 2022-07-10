@@ -90,6 +90,7 @@ class BaseStrategy:
     def restart(self):
         raise NotImplementedError("This method must be overridden in the derived class.")
 
+
 class State(Enum):
     STOPPED = "The strategy is currently not running."
     RUNNING = "The strategy is currently running."

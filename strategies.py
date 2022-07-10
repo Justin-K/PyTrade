@@ -31,6 +31,11 @@ class SimpleSpotStrategy(BaseStrategy):
                 from BalanceException(f"Designated quantity is larger than the available quantity of {self.market.quote_asset} to trade.")
 
     def tick(self):
+        # for this strategy we want to place a buy order, calculate a sell price based on provided params,
+        # then place a limit-sell order for the bought quantity at that price. We wait for the sell order to fill,
+        # then sleep for SimpleSpotStrategyConfig.cooldown_period seconds. rinse and repeat.
+        # also, we can't poll the exchange "instantly" (this will exceed the rate limit of basically any exchange).
+        # To overcome this, we will sleep for BaseConfig.time_between_ticks seconds between calling the tick() method.
         pass
 
     def onTradeStart(self, in_progress_trade: Trade):
