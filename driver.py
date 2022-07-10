@@ -5,7 +5,7 @@ from auth import KucoinAPI
 from ccxt import kucoin
 
 config = SimpleSpotStrategyConfig()
-config.quantity = 0.5
+config.quantity = 2500
 config.client = kucoin()
 config.time_between_ticks = 30
 config.take_profit = 0.5
@@ -28,4 +28,5 @@ sandbox_api.password = ''
 
 
 strategy = SimpleSpotStrategy(config, market, sandbox_api)
-strategy.run()
+strategy.authenticate(True)
+strategy.validate()

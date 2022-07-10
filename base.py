@@ -1,5 +1,5 @@
 from ccxt import Exchange
-from errors import ValidationException, AuthenticationException
+from errors import ValidationException, AuthenticationException, MarketNotFoundError, SettingsError
 from trade import Trade
 from enum import Enum
 
@@ -15,6 +15,8 @@ class Market:
 
     def setMarket(self, exchange: Exchange):
         exchange.load_markets()
+        if self.symbol not in exchange.symbols:
+            raise MarketNotFoundError(f"{self.symbol} market not found on exchange.")
         market = exchange.market(self.symbol)
         self.taker_fee = market["taker"] if market["taker"] != "" else self.taker_fee
         self.maker_fee = market["maker"] if market["maker"] != "" else self.maker_fee
@@ -61,6 +63,11 @@ class BaseStrategy:
         if not self.authenticated:
             raise ValidationException("A validation error has occurred.") \
                 from AuthenticationException("Exchange instance is not authenticated (did you forget to call authenticate()?).")
+        if None in self.config.__dict__.values() or \
+                None in self.market.__dict__.values() or \
+                None in self.api_credentials.__dict__.values():
+            raise ValidationException("A validation error has occurred.") \
+                from SettingsError("One or more setting is unset (aka the value for the setting is null).")
 
     def tick(self):
         raise NotImplementedError("This method must be overridden in the derived class.")
@@ -68,7 +75,7 @@ class BaseStrategy:
     def updateConfig(self, new_config, new_market=None, new_api=None):
         raise NotImplementedError("This method must be overridden in the derived class.")
 
-    def onTradeCompletion(self, finished_trade: Trade):
+    def onTradeComplete(self, finished_trade: Trade):
         raise NotImplementedError("This method must be overridden in the derived class.")
 
     def onTradeStart(self, in_progress_trade: Trade):
@@ -80,6 +87,8 @@ class BaseStrategy:
     def stop(self):
         raise NotImplementedError("This method must be overridden in the derived class.")
 
+    def restart(self):
+        raise NotImplementedError("This method must be overridden in the derived class.")
 
 class State(Enum):
     STOPPED = "The strategy is currently not running."

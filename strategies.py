@@ -3,6 +3,7 @@ from trade import Trade
 from ccxt.base.errors import NetworkError
 from function_library import calculatePrice, average, s_to_ms
 from time import sleep
+from errors import ValidationException, CurrencyException, BalanceException
 from threading import Event
 
 
@@ -21,8 +22,13 @@ class SimpleSpotStrategy(BaseStrategy):
 
     def validate(self):
         super().validate()
-        # verify that the user has enough available capital to run the strategy
-        # ensure that the config is good (no empty values)
+        balance_struct = self.config.client.fetchBalance()
+        if self.market.quote_asset not in balance_struct["free"].keys() or balance_struct["free"][self.market.quote_asset] == 0:
+            raise ValidationException("A validation error has occurred.") \
+                from CurrencyException(f"No {self.market.quote_asset} available to trade.")
+        if self.config.quantity > balance_struct["free"][self.market.quote_asset]:
+            raise ValidationException("A validation error has occurred.") \
+                from BalanceException(f"Designated quantity is larger than the available quantity of {self.market.quote_asset} to trade.")
 
     def tick(self):
         pass
@@ -31,7 +37,7 @@ class SimpleSpotStrategy(BaseStrategy):
         # register the new trade to be handled/monitored?
         pass
 
-    def onTradeCompletion(self, finished_trade: Trade):
+    def onTradeComplete(self, finished_trade: Trade):
         self.trade = Trade(self.market.symbol, self.config.quantity)
         # log the finished trade in a db, pass off to a Reporter-type class, or both!
 
@@ -61,8 +67,9 @@ class SimpleSpotStrategy(BaseStrategy):
     def stop(self):
         self.event.set()
 
-    # def reset(self):
-    #     self.event.clear()
+    def restart(self):
+        self.event.clear()
+        self.run()
 
 
 
