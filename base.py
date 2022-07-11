@@ -95,7 +95,7 @@ class State(Enum):
     STOPPED = "The strategy is currently not running."
     RUNNING = "The strategy is currently running."
     ERROR = "The strategy encountered an error."
-    WAITING = "The strategy is currently awaiting a start condition."
+    WAITING = "The strategy is currently awaiting a condition."
 
 
 if __name__ == "__main__":

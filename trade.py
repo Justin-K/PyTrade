@@ -2,10 +2,12 @@ from function_library import profitLoss, ms_to_s, from_utc_timestamp_to_local_da
 
 
 class Trade:
+
     # a trade (hypothetically at least) is defined by 2 orders: a buy order and a sell order
-    def __init__(self, symbol: str, quantity):
+    def __init__(self, symbol: str, volume):
         self.symbol = symbol.upper()
-        self.quantity = quantity
+        self.volume_quote = volume
+        self.volume_base = None
         self.time_bought_utc = None
         self.time_sold_utc = None
         self.buy_price = None
@@ -15,7 +17,7 @@ class Trade:
 
     @property
     def profit(self):
-        return profitLoss(self.buy_price, self.sell_price, self.quantity)
+        return profitLoss(self.buy_price, self.sell_price, self.volume_quote)
 
     @property
     def execution_time(self):
@@ -36,7 +38,7 @@ class Trade:
 
     @property
     def gain(self):
-        return (self.profit/(self.buy_price*self.quantity)) * 100
+        return (self.profit / (self.buy_price * self.volume_quote)) * 100
 
     def __repr__(self):
         sign = "+" if self.profit > 0 else ""

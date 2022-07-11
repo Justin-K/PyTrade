@@ -30,3 +30,8 @@ sandbox_api.password = ''
 # strategy = SimpleSpotStrategy(config, market, sandbox_api)
 # strategy.authenticate(True)
 # strategy.validate()
+
+
+
+# buy give quote currency and receive base currency; for example, buying BTC/USD means that you will receive bitcoins for your dollars.
+# sell give base currency and receive quote currency; for example, buying BTC/USD means that you will receive dollars for your bitcoins.
