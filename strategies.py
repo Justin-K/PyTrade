@@ -11,7 +11,7 @@ class SimpleSpotStrategy(BaseStrategy):
 
     def __init__(self, user_config, market, api):
         super().__init__(user_config, market, api)
-        self.trade = Trade(self.market.symbol, self.config.volume_quote)
+        self.trade = Trade(self.market.symbol, self.config.quantity)
         self.event = Event()
         self.state = State.STOPPED
 
@@ -26,7 +26,7 @@ class SimpleSpotStrategy(BaseStrategy):
         if self.market.quote_asset not in balance_struct["free"].keys() or balance_struct["free"][self.market.quote_asset] == 0:
             raise ValidationException("A validation error has occurred.") \
                 from CurrencyException(f"No {self.market.quote_asset} available to trade.")
-        if self.config.volume_quote > balance_struct["free"][self.market.quote_asset]:
+        if self.config.quantity > balance_struct["free"][self.market.quote_asset]:
             raise ValidationException("A validation error has occurred.") \
                 from BalanceException(f"Designated quantity is larger than the available quantity of {self.market.quote_asset} to trade.")
 
@@ -64,7 +64,7 @@ class SimpleSpotStrategy(BaseStrategy):
                 self.trade.time_bought_utc = average([buy_order["timestamp"], self.config.client.milliseconds()])
                 self.trade.buy_order_id = buy_order["id"]
                 self.trade.volume_base = buy_order["cost"]  # ?????? works??
-                self.trade.buy_price = buy_order["price"]
+                self.trade.buy_price = buy_order["price"] if buy_order["price"] else price
                 sell_price = calculatePrice(self.trade.buy_price,
                                             percentage_to_decimal(self.config.take_profit),
                                             [self.market.maker_fee, self.market.taker_fee])
@@ -77,7 +77,16 @@ class SimpleSpotStrategy(BaseStrategy):
 
     def onTradeStart(self, in_progress_trade: Trade):
         # register the new trade to be handled/monitored?
-        pass
+        with open("debug.txt", "a") as f:
+            f.write(str(self.trade.symbol) + "\n")
+            f.write(str(self.trade.volume_quote) + "\n")
+            f.write(str(self.trade.volume_base) + "\n")
+            f.write(str(self.trade.time_bought_utc) + "\n")
+            f.write(str(self.trade.time_sold_utc) + "\n")
+            f.write(str(self.trade.buy_price) + "\n")
+            f.write(str(self.trade.sell_price) + "\n")
+            f.write(str(self.trade.buy_order_id) + "\n")
+            f.write(str(self.trade.sell_order_id) + "\n")
 
     def onTradeComplete(self, finished_trade: Trade):
         self.trade = Trade(self.market.symbol, self.config.volume_quote)

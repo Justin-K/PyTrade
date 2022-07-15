@@ -9,6 +9,7 @@
   - [ ] Test the tick() method
   - [ ] Make sure that the code in SimpleSpotStrategy.validate() shouldn't be in the validate() method of BaseStrategy
 - [ ] Integrate MongoDB into the project
+- [ ] Test the calculatePrice() function.
 
 ### Completed
 - [x] Complete the updateConfig() method of SimpleSpotStrategy.
