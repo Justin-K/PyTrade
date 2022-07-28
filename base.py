@@ -7,7 +7,7 @@ from enum import Enum
 class Market:
 
     def __init__(self, symbol: str):
-        self.symbol = symbol
+        self.symbol = symbol.upper()
         self.taker_fee = 0.002
         self.maker_fee = 0.0016
         self.base_asset = None
@@ -29,15 +29,15 @@ class BaseAPI:
     def __init__(self):
         self.api_key = None
         self.api_secret = None
+        self.is_sandbox_api = None
 
-    def authenticateClient(self, sandbox_api=False) -> Exchange:
+    def authenticateClient(self) -> Exchange:
         raise NotImplementedError("This method must be overridden in the derived class.")
 
 
 class BaseUserConfig:
 
     def __init__(self):
-        self.client = None
         self.take_profit = None
         self.quantity = None
         self.time_between_ticks = None
@@ -50,14 +50,17 @@ class BaseStrategy:
                     issubclass(type(market), Market),
                     issubclass(type(api), BaseAPI)]):
             raise ParameterError("One or more parameter isn't a child of BaseAPI")
+        self.authenticated = False
         self.config = user_config
         self.market = market
-        self.market.setMarket(self.config.client)
         self.api_credentials = api
-        self.authenticated = False
+        self.client = self.api_credentials.authenticateClient()
+        self.client.check_required_credentials()
+        self.authenticated = True
+        self.market.setMarket(self.client)
 
-    def authenticate(self):
-        raise NotImplementedError("This method must be overridden in the derived class.")
+    # def authenticate(self):
+    #     raise NotImplementedError("This method must be overridden in the derived class.")
 
     def validate(self):
         if not self.authenticated:

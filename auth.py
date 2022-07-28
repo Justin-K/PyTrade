@@ -1,13 +1,14 @@
 from base import BaseAPI
 from ccxt import kucoin, Exchange
 
+
 class KucoinAPI(BaseAPI):
 
     def __init__(self):
         super().__init__()
         self.password = None
 
-    def authenticateClient(self, sandbox_api=False) -> Exchange:
+    def authenticateClient(self) -> Exchange:
         if self.password is None or self.api_key is None or self.api_secret is None:
             raise Exception("One or more settings are unset.")
         else:
@@ -16,7 +17,7 @@ class KucoinAPI(BaseAPI):
                 "secret": self.api_secret,
                 "password": self.password
             })
-            if sandbox_api:
+            if self.is_sandbox_api:
                 client.set_sandbox_mode(True)
                 return client
             else:

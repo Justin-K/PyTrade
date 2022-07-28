@@ -14,14 +14,10 @@ class SimpleSpotStrategy(BaseStrategy):
         self.event = Event()
         self.state = State.STOPPED
 
-    def authenticate(self, is_sandbox=False):
-        self.config.client = self.api_credentials.authenticateClient(sandbox_api=is_sandbox)
-        self.config.client.check_required_credentials()
-        self.authenticated = True
 
     def validate(self):
         super().validate()
-        balance_struct = self.config.client.fetchBalance()
+        balance_struct = self.client.fetchBalance()
         if self.market.quote_asset not in balance_struct["free"].keys() or balance_struct["free"][self.market.quote_asset] == 0:
             raise ValidationException("A validation error has occurred.") \
                 from CurrencyException(f"No {self.market.quote_asset} available to trade.")
@@ -44,10 +40,10 @@ class SimpleSpotStrategy(BaseStrategy):
         # Trade.sell_order_id x
         # Trade.volume_base x
         if self.trade.sell_order_id and self.trade.buy_order_id:  # an initial (market) buy order has been filled and a sell order has been placed
-            sell_order = self.config.client.fetchOrder(self.trade.sell_order_id)
+            sell_order = self.client.fetchOrder(self.trade.sell_order_id)
             if sell_order["status"] == "closed":  # the sell order has filled, successfully completing a trade
                 self.trade.sell_price = sell_order["price"]
-                ms_now = self.config.client.milliseconds()
+                ms_now = self.client.milliseconds()
                 tbt = self.config.time_between_ticks
                 self.trade.time_sold_utc = sell_order["lastTradeTimestamp"] if sell_order["lastTradeTimestamp"] else (ms_now - s_to_ms(tbt))
                 self.onTradeComplete(self.trade)
@@ -55,19 +51,19 @@ class SimpleSpotStrategy(BaseStrategy):
                 raise OrderError(f"The sell order (id: {self.trade.sell_order_id}) has since been rejected, canceled, or it expired")
         if not self.trade.buy_order_id:  # a buy order has yet to be placed
             assert not self.trade.sell_order_id
-            price = self.config.client.fetchTicker(self.market.symbol)["last"]
+            price = self.client.fetchTicker(self.market.symbol)["last"]
             if self.config.trade_min < price < self.config.trade_max:  # check if the price of the commodity is in the range provided
                 self.state = State.RUNNING if self.state == State.WAITING else self.state  # make sure this line won't be a trouble-maker :)
-                buy_order = self.config.client.createMarketBuyOrder(self.market.symbol, self.config.quantity)
+                buy_order = self.client.createMarketBuyOrder(self.market.symbol, self.config.quantity)
                 self.event.wait(.5)
-                self.trade.time_bought_utc = average([buy_order["timestamp"], self.config.client.milliseconds()])
+                self.trade.time_bought_utc = average([buy_order["timestamp"], self.client.milliseconds()])
                 self.trade.buy_order_id = buy_order["id"]
                 self.trade.volume_base = buy_order["cost"]  # ?????? works??
                 self.trade.buy_price = buy_order["price"] if buy_order["price"] else price
                 sell_price = calculatePrice(self.trade.buy_price,
                                             percentage_to_decimal(self.config.take_profit),
                                             [self.market.maker_fee, self.market.taker_fee])
-                sell_order = self.config.client.createLimitSellOrder(self.market.symbol, self.config.quantity, sell_price)
+                sell_order = self.client.createLimitSellOrder(self.market.symbol, self.config.quantity, sell_price)
                 self.trade.sell_order_id = sell_order["id"]
                 self.onTradeStart(self.trade)
 
