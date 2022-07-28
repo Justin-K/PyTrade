@@ -2,7 +2,6 @@ from base import BaseStrategy, State
 from trade import Trade
 from ccxt.base.errors import NetworkError
 from function_library import calculatePrice, average, s_to_ms, percentage_to_decimal
-from time import sleep
 from errors import ValidationException, CurrencyException, BalanceException, OrderError
 from threading import Event
 

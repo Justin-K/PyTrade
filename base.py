@@ -1,5 +1,5 @@
 from ccxt import Exchange
-from errors import ValidationException, AuthenticationException, MarketNotFoundError, SettingsError
+from errors import ValidationException, AuthenticationException, MarketNotFoundError, SettingsError, ParameterError
 from trade import Trade
 from enum import Enum
 
@@ -30,7 +30,7 @@ class BaseAPI:
         self.api_key = None
         self.api_secret = None
 
-    def authenticateClient(self, sandbox_api=False):
+    def authenticateClient(self, sandbox_api=False) -> Exchange:
         raise NotImplementedError("This method must be overridden in the derived class.")
 
 
@@ -49,7 +49,7 @@ class BaseStrategy:
         if not all([issubclass(type(user_config), BaseUserConfig),
                     issubclass(type(market), Market),
                     issubclass(type(api), BaseAPI)]):
-            raise Exception("One or more parameter is not derived from the appropriate base class.")
+            raise ParameterError("One or more parameter isn't a child of BaseAPI")
         self.config = user_config
         self.market = market
         self.market.setMarket(self.config.client)
