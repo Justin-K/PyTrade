@@ -16,5 +16,6 @@ class SmartTrade(BaseStrategy):
 
 
 
+
 if __name__ == "__main__":
     pass

@@ -14,7 +14,6 @@ class SimpleSpotStrategy(BaseStrategy):
         self.event = Event()
         self.state = State.STOPPED
 
-
     def validate(self):
         super().validate()
         balance_struct = self.client.fetchBalance()

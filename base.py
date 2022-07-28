@@ -24,6 +24,7 @@ class Market:
         self.quote_asset = market["quote"]
 
 
+
 class BaseAPI:
 
     def __init__(self):
@@ -99,6 +100,11 @@ class State(Enum):
     RUNNING = "The strategy is currently running."
     ERROR = "The strategy encountered an error."
     WAITING = "The strategy is currently awaiting a condition."
+
+
+class OrderType(Enum):
+    MARKET = "market_order"
+    LIMIT = "limit_order"
 
 
 if __name__ == "__main__":
