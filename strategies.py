@@ -1,4 +1,4 @@
-from base import BaseStrategy, State
+from base import BaseStrategy, State, OrderType
 from trade import Trade
 from ccxt.base.errors import NetworkError
 from function_library import calculatePrice, average, s_to_ms, percentage_to_decimal
@@ -31,18 +31,12 @@ class SimpleSpotStrategy(BaseStrategy):
         # also, we can't poll the exchange "instantly" (this will exceed the rate limit of basically any exchange).
         # To overcome this, we will sleep for BaseConfig.time_between_ticks seconds between calling the tick() method.
         # Also, set all the fields in self.trade:
-        # Trade.time_bought_utc x
-        # Trade.time_sold_utc x
-        # Trade.buy_price x
-        # Trade.sell_price x
-        # Trade.buy_order_id x
-        # Trade.sell_order_id x
-        # Trade.volume_base x
+
         if self.trade.sell_order_id and self.trade.buy_order_id:  # an initial (market) buy order has been filled and a sell order has been placed
-            sell_order = self.client.fetchOrder(self.trade.sell_order_id)
+            sell_order: dict = self.client.fetchOrder(self.trade.sell_order_id)
             if sell_order["status"] == "closed":  # the sell order has filled, successfully completing a trade
-                self.trade.sell_price = sell_order["price"]
-                ms_now = self.client.milliseconds()
+                self.trade.sell_price_quote = sell_order["price"]
+                ms_now: int = self.client.milliseconds()
                 tbt = self.config.time_between_ticks
                 self.trade.time_sold_utc = sell_order["lastTradeTimestamp"] if sell_order["lastTradeTimestamp"] else (ms_now - s_to_ms(tbt))
                 self.onTradeComplete(self.trade)
@@ -57,8 +51,10 @@ class SimpleSpotStrategy(BaseStrategy):
                 self.event.wait(.5)
                 self.trade.time_bought_utc = average([buy_order["timestamp"], self.client.milliseconds()])
                 self.trade.buy_order_id = buy_order["id"]
-                self.trade.volume_base = buy_order["cost"]  # ?????? works??
+                self.trade.initial_volume_base = buy_order["cost"]  # ?????? works??
                 self.trade.buy_price = buy_order["price"] if buy_order["price"] else price
+                self.trade.sell_order_type = OrderType.LIMIT
+                self.trade.buy_order_type = OrderType.MARKET
                 sell_price = calculatePrice(self.trade.buy_price,
                                             percentage_to_decimal(self.config.take_profit),
                                             [self.market.maker_fee, self.market.taker_fee])
@@ -71,16 +67,7 @@ class SimpleSpotStrategy(BaseStrategy):
 
     def onTradeStart(self, in_progress_trade: Trade):
         # register the new trade to be handled/monitored?
-        with open("debug.txt", "a") as f:
-            f.write(str(self.trade.symbol) + "\n")
-            f.write(str(self.trade.volume_quote) + "\n")
-            f.write(str(self.trade.volume_base) + "\n")
-            f.write(str(self.trade.time_bought_utc) + "\n")
-            f.write(str(self.trade.time_sold_utc) + "\n")
-            f.write(str(self.trade.buy_price) + "\n")
-            f.write(str(self.trade.sell_price) + "\n")
-            f.write(str(self.trade.buy_order_id) + "\n")
-            f.write(str(self.trade.sell_order_id) + "\n")
+        pass
 
     def onTradeComplete(self, finished_trade: Trade):
         self.trade = Trade(self.market.symbol, self.config.volume_quote)

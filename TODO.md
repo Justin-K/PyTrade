@@ -11,10 +11,12 @@
 - [ ] Integrate MongoDB into the project
 - [ ] Test the calculatePrice() function.
 - [ ] Make some sort of report system to store and present performance statistics to the user.
+  - [ ] Make an HTML (report) template
 - [ ] Complete the SmartTrade class
   - [ ] Test the SmartTrade class
 - [ ] Organize the project into different folders
 - [ ] Make/complete a TradingBot class (handler class) to run and manage multiple strategies
+- [ ] Review additions to trade.Trade and ensure proper refactor
 
 ### Test
 

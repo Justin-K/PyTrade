@@ -8,8 +8,8 @@ class Market:
 
     def __init__(self, symbol: str):
         self.symbol = symbol.upper()
-        self.taker_fee = 0.002
-        self.maker_fee = 0.0016
+        self.taker_fee: float = 0.002
+        self.maker_fee: float = 0.0016
         self.base_asset = None
         self.quote_asset = None
 
@@ -18,10 +18,10 @@ class Market:
         if self.symbol not in exchange.symbols:
             raise MarketNotFoundError(f"{self.symbol} market not found on exchange.")
         market = exchange.market(self.symbol)
-        self.taker_fee = market["taker"] if market["taker"] != "" else self.taker_fee
-        self.maker_fee = market["maker"] if market["maker"] != "" else self.maker_fee
-        self.base_asset = market["base"]
-        self.quote_asset = market["quote"]
+        self.taker_fee: float = market["taker"] if market["taker"] != "" else self.taker_fee
+        self.maker_fee: float = market["maker"] if market["maker"] != "" else self.maker_fee
+        self.base_asset: str = market["base"]
+        self.quote_asset: str = market["quote"]
 
 
 
@@ -46,7 +46,7 @@ class BaseUserConfig:
 
 class BaseStrategy:
 
-    def __init__(self, user_config, market, api):
+    def __init__(self, user_config, market, api, name="New Strategy"):
         if not all([issubclass(type(user_config), BaseUserConfig),
                     issubclass(type(market), Market),
                     issubclass(type(api), BaseAPI)]):
@@ -59,6 +59,7 @@ class BaseStrategy:
         self.client.check_required_credentials()
         self.authenticated = True
         self.market.setMarket(self.client)
+        self.name = None
 
     # def authenticate(self):
     #     raise NotImplementedError("This method must be overridden in the derived class.")
@@ -96,15 +97,15 @@ class BaseStrategy:
 
 
 class State(Enum):
-    STOPPED = "The strategy is currently not running."
-    RUNNING = "The strategy is currently running."
-    ERROR = "The strategy encountered an error."
-    WAITING = "The strategy is currently awaiting a condition."
+    STOPPED: str = "The strategy is currently not running."
+    RUNNING: str = "The strategy is currently running."
+    ERROR: str = "The strategy encountered an error."
+    WAITING: str = "The strategy is currently awaiting a condition."
 
 
 class OrderType(Enum):
-    MARKET = "market_order"
-    LIMIT = "limit_order"
+    MARKET: str = "market_order"
+    LIMIT: str = "limit_order"
 
 
 if __name__ == "__main__":

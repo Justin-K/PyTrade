@@ -18,7 +18,7 @@ def s_to_ms(s):
     return s/0.001
 
 
-def profitLoss(buy_price, sell_price, qty):  # (sell_price - buy_price) * qty
+def profitLoss(buy_price, sell_price, qty):  # (sell_price_quote - buy_price) * qty
     return (sell_price - buy_price) * qty
 
 
