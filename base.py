@@ -67,12 +67,12 @@ class BaseStrategy:
     def validate(self):
         if not self.authenticated:
             raise ValidationException("A validation error has occurred.") \
-                from AuthenticationException("Exchange instance is not authenticated (did you forget to call authenticate()?).")
+                from AuthenticationException("Exchange instance is not authenticated.")
         if None in self.config.__dict__.values() or \
                 None in self.market.__dict__.values() or \
                 None in self.api_credentials.__dict__.values():
             raise ValidationException("A validation error has occurred.") \
-                from SettingsError("One or more setting is unset (aka the value for the setting is null).")
+                from SettingsError("One or more setting is unset (the value(s) for the setting(s) is null).")
 
     def tick(self):
         raise NotImplementedError("This method must be overridden in the derived class.")

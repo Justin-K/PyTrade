@@ -17,6 +17,7 @@
 - [ ] Organize the project into different folders
 - [ ] Make/complete a TradingBot class (handler class) to run and manage multiple strategies
 - [ ] Review additions to trade.Trade and ensure proper refactor
+- [ ] Remove the client attribute of BaseStrategy (bad things happen when multiple strategies use multiple instances of ccxt.Exchange using one API key)
 
 ### Test
 
