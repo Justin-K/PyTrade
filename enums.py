@@ -9,8 +9,8 @@ class State(Enum):
 
 
 class OrderType(Enum):
-    MARKET: str = "market_order"
-    LIMIT: str = "limit_order"
+    MARKET: str = "market"
+    LIMIT: str = "limit"
 
 
 class OrderStatus(Enum):
@@ -22,10 +22,10 @@ class OrderStatus(Enum):
 
 
 class TimeInForce(Enum):
-    FOK: str = "fill_or_kill"
-    IOC: str = "immediate_or_cancel"
-    GTC: str = "good_till_canceled"
-    PO: str = "post_only"
+    FOK: str = "FOK"
+    IOC: str = "IOC"
+    GTC: str = "GTC"
+    PO: str = "PO"
 
 
 class Side(Enum):
