@@ -46,7 +46,7 @@ class Trade:
 
     def __repr__(self):
         sign = "+" if self.profit > 0 else ""
-        return f"Symbol: {self.symbol} | Net: {sign+str(round(self.gain, 2))+'%'}"
+        return f"Symbol: {self.symbol} | Gross Gain: {sign+str(round(self.gain, 2))+'%'}"
 
 
 if __name__ == "__main__":

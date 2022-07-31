@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 from dateutil import tz
 from errors import SeperatorError
 
+
 def decimal_to_percentage(x):
     return x * 100
 

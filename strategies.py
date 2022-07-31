@@ -35,10 +35,10 @@ class SimpleSpotStrategy(BaseStrategy):
         if self.trade.sell_order_id and self.trade.buy_order_id:  # an initial (market) buy order has been filled and a sell order has been placed
             sell_order: dict = self.client.fetchOrder(self.trade.sell_order_id)
             if sell_order["status"] == "closed":  # the sell order has filled, successfully completing a trade
-                self.trade.sell_price_quote = sell_order["price"]
-                ms_now: int = self.client.milliseconds()
-                tbt = self.config.time_between_ticks
-                self.trade.time_sold_utc = sell_order["lastTradeTimestamp"] if sell_order["lastTradeTimestamp"] else (ms_now - s_to_ms(tbt))
+                # self.trade.sell_price_quote = sell_order["price"]
+                # ms_now: int = self.client.milliseconds()
+                # tbt = self.config.time_between_ticks
+                # self.trade.time_sold_utc = sell_order["lastTradeTimestamp"] if sell_order["lastTradeTimestamp"] else (ms_now - s_to_ms(tbt))
                 self.onTradeComplete(self.trade)
             elif sell_order["status"] in ["expired", "rejected", "canceled"]:  # the sell order has expired, been rejected or canceled
                 raise OrderError(f"The sell order (id: {self.trade.sell_order_id}) has since been rejected, canceled, or it expired")
@@ -49,17 +49,17 @@ class SimpleSpotStrategy(BaseStrategy):
                 self.state = State.RUNNING if self.state == State.WAITING else self.state  # make sure this line won't be a trouble-maker :)
                 buy_order = self.client.createMarketBuyOrder(self.market.symbol, self.config.quantity)
                 self.event.wait(.5)
-                self.trade.time_bought_utc = average([buy_order["timestamp"], self.client.milliseconds()])
-                self.trade.buy_order_id = buy_order["id"]
-                self.trade.initial_volume_base = buy_order["cost"]  # ?????? works??
-                self.trade.buy_price = buy_order["price"] if buy_order["price"] else price
-                self.trade.sell_order_type = OrderType.LIMIT
-                self.trade.buy_order_type = OrderType.MARKET
-                sell_price = calculatePrice(self.trade.buy_price,
+                # self.trade.time_bought_utc = average([buy_order["timestamp"], self.client.milliseconds()])
+                # self.trade.buy_order_id = buy_order["id"]
+                # self.trade.initial_volume_base = buy_order["cost"]  # ?????? works??
+                # self.trade.buy_price = buy_order["price"] if buy_order["price"] else price
+                # self.trade.sell_order_type = OrderType.LIMIT
+                # self.trade.buy_order_type = OrderType.MARKET
+                sell_price = calculatePrice(buy_order["price"] if buy_order["price"] else price,  # self.trade.buy_price
                                             percentage_to_decimal(self.config.take_profit),
                                             [self.market.maker_fee, self.market.taker_fee])
                 sell_order = self.client.createLimitSellOrder(self.market.symbol, self.config.quantity, sell_price)
-                self.trade.sell_order_id = sell_order["id"]
+                # self.trade.sell_order_id = sell_order["id"]
                 self.onTradeStart(self.trade)
 
             else:
