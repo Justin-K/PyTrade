@@ -1,10 +1,11 @@
-from function_library import profitLoss, ms_to_s, from_utc_timestamp_to_local_datetime
+from function_library import profitLoss, ms_to_s, from_utc_timestamp_to_local_datetime, seperatePair
 
 class Trade:
 
     # a trade (hypothetically at least) is defined by 2 orders: a buy order and a sell order
     def __init__(self, symbol: str, volume):
         self.symbol = symbol.upper()
+        self.base_asset, self.quote_asset = seperatePair(self.symbol)
         self.initial_volume_quote = volume
         self.initial_volume_base = None
         self.time_bought_utc = None

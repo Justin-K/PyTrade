@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 from dateutil import tz
-
+from errors import SeperatorError
 
 def decimal_to_percentage(x):
     return x * 100
@@ -49,6 +49,21 @@ def from_utc_timestamp_to_local_datetime(utc_timestamp: int) -> datetime:  # cre
 
 def average(data: list):
     return sum(data)/len(data)
+
+
+def seperatePair(symbol: str) -> tuple:
+    separators = ["/", "-"]
+    separator = None
+    sbml = symbol.upper()
+    for char in sbml:
+        if char in separators:
+            separator = char
+            break
+    if separator is None:
+        raise SeperatorError("A valid separator was not found. Base and quote asset deduction failed.")
+    else:
+        splt = sbml.split(separator)
+        return splt[0], splt[1]
 
 
 if __name__ == "__main__":
