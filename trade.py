@@ -1,5 +1,4 @@
 from function_library import profitLoss, ms_to_s, from_utc_timestamp_to_local_datetime
-from base import OrderType
 
 class Trade:
 
