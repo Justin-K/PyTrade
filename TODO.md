@@ -9,6 +9,7 @@
   - [ ] Test the tick() method
   - [ ] Make sure that the code in SimpleSpotStrategy.validate() shouldn't be in the validate() method of BaseStrategy
 - [ ] Integrate MongoDB into the project
+  - [ ] Write a MongoDB wrapper
 - [ ] Test the calculatePrice() function.
 - [ ] Make some sort of report system to store and present performance statistics to the user.
   - [ ] Make an HTML (report) template
@@ -17,7 +18,7 @@
 - [ ] Organize the project into different folders
 - [ ] Make/complete a TradingBot class (handler class) to run and manage multiple strategies
 - [ ] Review additions to trade.Trade and ensure proper refactor
-- [ ] Remove the client attribute of BaseStrategy (bad things happen when multiple strategies use multiple instances of ccxt.Exchange using one API key)
+- [ ] Remove the client attribute of BaseStrategy (bad things happen when multiple strategies use multiple instances of ccxt.Exchange using a single API key)
 
 ### Test
 

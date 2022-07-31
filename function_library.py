@@ -60,7 +60,7 @@ def seperatePair(symbol: str) -> tuple:
             separator = char
             break
     if separator is None:
-        raise SeperatorError("A valid separator was not found. Base and quote asset deduction failed.")
+        raise SeperatorError(f"A valid separator was not found. Base and quote asset deduction failed. ({symbol})")
     else:
         splt = sbml.split(separator)
         return splt[0], splt[1]
