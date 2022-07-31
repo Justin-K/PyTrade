@@ -1,4 +1,5 @@
-from base import BaseStrategy, State, OrderType
+from base import BaseStrategy
+from enums import State, OrderType, OrderStatus
 from trade import Trade
 from ccxt.base.errors import NetworkError
 from function_library import calculatePrice, average, s_to_ms, percentage_to_decimal
@@ -34,7 +35,7 @@ class SimpleSpotStrategy(BaseStrategy):
 
         if self.trade.sell_order_id and self.trade.buy_order_id:  # an initial (market) buy order has been filled and a sell order has been placed
             sell_order: dict = self.client.fetchOrder(self.trade.sell_order_id)
-            if sell_order["status"] == "closed":  # the sell order has filled, successfully completing a trade
+            if sell_order["status"] == OrderStatus.CLOSED:  # the sell order has filled, successfully completing a trade
                 # self.trade.sell_price_quote = sell_order["price"]
                 # ms_now: int = self.client.milliseconds()
                 # tbt = self.config.time_between_ticks

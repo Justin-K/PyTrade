@@ -1,5 +1,22 @@
 from function_library import profitLoss, ms_to_s, from_utc_timestamp_to_local_datetime, seperatePair
 
+
+class Order:
+
+    def __init__(self, symbol: str, _id: str):
+        self._id = None
+        self.status = None
+        self.symbol = symbol
+        self.order_type = None
+        self.time_in_force = None
+        self.side = None
+        self.price_quote = None
+        self.quantity_base = None
+        self.filled_base = None
+        self.cost = None
+        self.trades = []
+        self.fees = {}
+
 class Trade:
 
     # a trade (hypothetically at least) is defined by 2 orders: a buy order and a sell order

@@ -2,7 +2,8 @@ from datetime import datetime
 from ccxt import kucoin
 from random import choice, randrange, uniform, random
 from trade import Trade
-from base import OrderType
+from enums import OrderType
+
 
 def tradeGenerator(num_trades: int):
     max_time = int((datetime.utcnow() - datetime(1970, 1, 1)).total_seconds())
