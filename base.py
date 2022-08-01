@@ -58,7 +58,7 @@ class BaseStrategy:
         self.client.check_required_credentials()
         self.authenticated = True
         self.market.setMarket(self.client)
-        self.name = None
+        self.name = name
 
     # def authenticate(self):
     #     raise NotImplementedError("This method must be overridden in the derived class.")
