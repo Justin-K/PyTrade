@@ -19,7 +19,8 @@
 - [ ] Make/complete a TradingBot class (handler class) to run and manage multiple strategies
 - [ ] Review additions to trade.Trade and ensure proper refactor
 - [ ] Remove the client attribute of BaseStrategy (bad things happen when multiple strategies use multiple instances of ccxt.Exchange using a single API key)
-- [ ] Adapt the trade.Trade class to handle more than 2 orders and successfully calculate the resulting profit 
+- [ ] Adapt the trade.Trade class to handle more than 2 orders and successfully calculate the resulting profit
+- [ ] Use bid/ask price instead of last?
 ### Test
 
 ### Completed

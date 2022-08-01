@@ -22,10 +22,10 @@ class OrderStatus(Enum):
 
 
 class TimeInForce(Enum):
-    FOK: str = "FOK"
-    IOC: str = "IOC"
-    GTC: str = "GTC"
-    PO: str = "PO"
+    FOK: str = "FOK"  # fill or kill
+    IOC: str = "IOC"  # immediate or canceled
+    GTC: str = "GTC"  # good 'till canceled
+    PO: str = "PO"  # post only
 
 
 class Side(Enum):
