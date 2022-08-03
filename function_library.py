@@ -53,7 +53,7 @@ def average(data: list):
 
 
 def seperatePair(symbol: str) -> tuple:
-    separators = ["/", "-"]
+    separators = ["/", "-", "_"]
     separator = None
     sbml = symbol.upper()
     for char in sbml:
