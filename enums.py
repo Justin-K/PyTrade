@@ -31,3 +31,11 @@ class TimeInForce(Enum):
 class Side(Enum):
     BUY: str = "buy"
     SELL: str = "sell"
+
+
+class Timeframe(Enum):
+    ONE_MINUTE = "1m"
+    ONE_HOUR = "1h"
+    ONE_DAY = "1d"
+    ONE_MONTH = "1M"
+    ONE_YEAR = "1y"
