@@ -22,8 +22,10 @@
 - [ ] Adapt the trade.Trade class to handle more than 2 orders and successfully calculate the resulting profit
 - [ ] Use bid/ask price instead of last?
 - [ ] Migrate every class that isn't mean't to be subclassed from base.py to another file
+- [ ] Complete the Chart class
+- [ ] Add an indicators.py file for technical indicators
 ### Test
-
+- [ ] Test the Chart class
 ### Completed
 - [x] Complete the updateConfig() method of SimpleSpotStrategy.
 - [x] Complete the validate() method

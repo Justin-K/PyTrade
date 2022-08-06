@@ -1,6 +1,9 @@
 from ccxt import Exchange
+from typing import List
+
 from errors import ValidationException, AuthenticationException, MarketNotFoundError, SettingsError, ParameterError
 from trade import Trade
+from enums import Timeframe
 
 
 class Market:
@@ -93,6 +96,41 @@ class BaseStrategy:
 
     def restart(self):
         raise NotImplementedError("This method must be overridden in the derived class.")
+
+
+class Candle:
+
+    def __init__(self):
+        self.utc_timestamp = None
+        self.open_price = None
+        self.highest_price = None
+        self.lowest_price = None
+        self.closing_price = None
+        self.volume_base = None  # *usually* in terms of the base currency
+
+
+class Chart:
+
+    def __init__(self, symbol: str, time_frame: Timeframe, client: Exchange, since=None):
+        self.symbol = symbol
+        self.time_frame = time_frame
+        self.candles: List[Candle] = []
+        self.client = client
+        self.start_time = since  # "...is an integer UTC timestamp in milliseconds"
+
+    def fetchCandles(self):
+        data = self.client.fetch_ohlcv(self.symbol, self.time_frame, since=self.start_time)
+        for ohlcv in data:
+            candle = Candle()
+            candle.utc_timestamp = ohlcv[0]
+            candle.utc_timestamp = ohlcv[1]
+            candle.open_price = ohlcv[2]
+            candle.highest_price = ohlcv[3]
+            candle.lowest_price = ohlcv[4]
+            candle.closing_price = ohlcv[5]
+            candle.volume_base = ohlcv[6]
+            self.candles.append(candle)
+
 
 
 if __name__ == "__main__":
