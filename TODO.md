@@ -24,6 +24,7 @@
 - [ ] Migrate every class that isn't mean't to be subclassed from base.py to another file
 - [ ] Complete the Chart class
 - [ ] Add an indicators.py file for technical indicators
+- [ ] ADD DOCUMENTATION!!
 ### Test
 - [ ] Test the Chart class
 ### Completed
