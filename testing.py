@@ -1,7 +1,7 @@
 from datetime import datetime
 from ccxt import kucoin
 from random import choice, randrange, uniform, random
-from trade import Trade
+from lib.trade import Trade
 from lib.enums import OrderType
 
 

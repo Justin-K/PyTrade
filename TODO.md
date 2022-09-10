@@ -26,10 +26,11 @@
 - [ ] Add an indicators.py file for technical indicators
 - [ ] ADD DOCUMENTATION!!
 ### Test
-- [ ] Test the Chart class
+
 ### Completed
 - [x] Complete the updateConfig() method of SimpleSpotStrategy.
 - [x] Complete the validate() method
 - [x] Test the validate() method
 - [x] Complete the tick() method
 - [x] Make a config object for the SmartTrade class
+- [x] Test the Chart class

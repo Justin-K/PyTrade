@@ -1,6 +1,6 @@
 from lib.base import BaseStrategy
 from lib.enums import State, OrderStatus
-from trade import Trade
+from lib.trade import Trade
 from ccxt.base.errors import NetworkError
 from lib.function_library import calculatePrice, percentage_to_decimal
 from lib.errors import ValidationException, CurrencyException, BalanceException, OrderError

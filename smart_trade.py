@@ -1,6 +1,6 @@
 # This system is inspired by 3comma's smart trades
 from lib.base import BaseStrategy
-from trade import Trade
+from lib.trade import Trade
 
 
 class SmartTrade(BaseStrategy):

@@ -1,5 +1,5 @@
 # A report generation system
-from trade import Trade
+from lib.trade import Trade
 
 
 class Report:
