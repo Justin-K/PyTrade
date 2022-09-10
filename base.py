@@ -112,25 +112,25 @@ class Candle:
 class Chart:
 
     def __init__(self, symbol: str, time_frame: Timeframe, client: Exchange, since=None):
-        self.symbol = symbol
+        self.symbol = symbol.upper()
         self.time_frame = time_frame
-        self.candles: List[Candle] = []
         self.client = client
         self.start_time = since  # "...is an integer UTC timestamp in milliseconds"
 
-    def fetchCandles(self):
-        data = self.client.fetch_ohlcv(self.symbol, self.time_frame, since=self.start_time)
+    @property
+    def candles(self):
+        candles: List[Candle] = []
+        data = self.client.fetch_ohlcv(self.symbol, self.time_frame.value, since=self.start_time)
         for ohlcv in data:
             candle = Candle()
             candle.utc_timestamp = ohlcv[0]
-            candle.utc_timestamp = ohlcv[1]
-            candle.open_price = ohlcv[2]
-            candle.highest_price = ohlcv[3]
-            candle.lowest_price = ohlcv[4]
-            candle.closing_price = ohlcv[5]
-            candle.volume_base = ohlcv[6]
-            self.candles.append(candle)
-
+            candle.open_price = ohlcv[1]
+            candle.highest_price = ohlcv[2]
+            candle.lowest_price = ohlcv[3]
+            candle.closing_price = ohlcv[4]
+            candle.volume_base = ohlcv[5]
+            candles.append(candle)
+        return candles
 
 
 if __name__ == "__main__":
