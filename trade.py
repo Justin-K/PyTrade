@@ -1,4 +1,4 @@
-from function_library import profitLoss, ms_to_s, from_utc_timestamp_to_local_datetime, seperatePair
+from lib.function_library import profitLoss, ms_to_s, from_utc_timestamp_to_local_datetime, seperatePair
 
 
 class Order:

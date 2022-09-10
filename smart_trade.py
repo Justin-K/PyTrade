@@ -1,7 +1,5 @@
 # This system is inspired by 3comma's smart trades
-from base import Market, BaseAPI, BaseStrategy
-from errors import ParameterError
-from auth import KucoinAPI
+from lib.base import BaseStrategy
 from trade import Trade
 
 

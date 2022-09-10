@@ -2,7 +2,7 @@ from datetime import datetime
 from ccxt import kucoin
 from random import choice, randrange, uniform, random
 from trade import Trade
-from enums import OrderType
+from lib.enums import OrderType
 
 
 def tradeGenerator(num_trades: int):

@@ -1,9 +1,9 @@
-from base import BaseStrategy
-from enums import State, OrderType, OrderStatus
+from lib.base import BaseStrategy
+from lib.enums import State, OrderStatus
 from trade import Trade
 from ccxt.base.errors import NetworkError
-from function_library import calculatePrice, average, s_to_ms, percentage_to_decimal
-from errors import ValidationException, CurrencyException, BalanceException, OrderError
+from lib.function_library import calculatePrice, percentage_to_decimal
+from lib.errors import ValidationException, CurrencyException, BalanceException, OrderError
 from threading import Event
 
 
