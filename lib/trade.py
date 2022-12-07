@@ -1,6 +1,10 @@
 from lib.function_library import profitLoss, ms_to_s, from_utc_timestamp_to_local_datetime, seperatePair
 
 
+# The idea behind this module is to provide a system for recording Orders and Trades with respect to
+# several differing factors: P/L, time, base/quote assets, initial and final volumes.
+# These classes MUST be usable throughout the entire framework, from strategy execution to logging and analysis
+
 class Order:
 
     def __init__(self, symbol: str, _id: str):
@@ -16,6 +20,7 @@ class Order:
         self.cost = None
         self.trades = []
         self.fees = {}
+
 
 class Trade:
 
@@ -63,7 +68,7 @@ class Trade:
 
     def __repr__(self):
         sign = "+" if self.profit > 0 else ""
-        return f"Symbol: {self.symbol} | Gross Gain: {sign+str(round(self.gain, 2))+'%'}"
+        return f"Symbol: {self.symbol} | Gross Gain: {sign + str(round(self.gain, 2)) + '%'}"
 
 
 if __name__ == "__main__":

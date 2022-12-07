@@ -4,6 +4,7 @@ from errors import ValidationException, AuthenticationException, MarketNotFoundE
 from trade import Trade
 from enums import Timeframe
 
+# Make all these dataclasses??
 
 class Market:
 
@@ -15,6 +16,7 @@ class Market:
         self.quote_asset = None
 
     def setMarket(self, exchange: Exchange):
+        # make the attributes referenced here properties, because this method is not necessary
         exchange.load_markets()
         if self.symbol not in exchange.symbols:
             raise MarketNotFoundError(f"{self.symbol} market not found on exchange.")
