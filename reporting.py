@@ -9,4 +9,3 @@ class Report:
 
     def addTrade(self, trade: Trade):
         self._trades.append(trade)
-

@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 from dateutil import tz
-from errors import SeperatorError
+from lib.errors import SeperatorError
 
 
 def decimal_to_percentage(x):
@@ -24,8 +24,8 @@ def profitLoss(buy_price, sell_price, qty):  # (sell_price_quote - buy_price) * 
 
 
 def calculatePrice(initial_price, desired_profit, offsets: list):
-    # each member of "offsets" MUST be in decimal form, i.e. pass .7 and it'll be interpreted as 70%
-    # desired_profit must also be in decimal form, i.e. pass .05 and it'll be interpreted as 5%
+    # each member of "offsets" MUST be in decimal form, i.e. pass .7, and it'll be interpreted as 70%
+    # desired_profit must also be in decimal form, i.e. pass .05, and it'll be interpreted as 5%
     offset_sum = sum([i for i in offsets]) if offsets else 0
     return (initial_price * (desired_profit + offset_sum)) + initial_price
 
@@ -52,7 +52,7 @@ def average(data: list):
     return sum(data)/len(data)
 
 
-def seperatePair(symbol: str) -> tuple:
+def seperatePair(symbol: str) -> tuple[str, str]:
     separators = ["/", "-", "_"]
     separator = None
     sbml = symbol.upper()
