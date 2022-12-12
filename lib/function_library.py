@@ -1,5 +1,7 @@
 from datetime import datetime, timezone
 from dateutil import tz
+from typing import Tuple
+
 from lib.errors import SeperatorError
 
 
@@ -52,7 +54,7 @@ def average(data: list):
     return sum(data)/len(data)
 
 
-def seperatePair(symbol: str) -> tuple[str, str]:
+def seperatePair(symbol: str) -> Tuple[str, str]:
     separators = ["/", "-", "_"]
     separator = None
     sbml = symbol.upper()

@@ -1,30 +1,22 @@
 from ccxt import Exchange
 from typing import List
-from errors import ValidationException, AuthenticationException, MarketNotFoundError, SettingsError, ParameterError
+from errors import ValidationException, AuthenticationException, SettingsError, ParameterError
 from trade import Trade
 from enums import Timeframe
+from function_library import seperatePair
 
-# Make all these dataclasses??
 
+# dataclass doesn't work here because symbol must be defined
 class Market:
 
     def __init__(self, symbol: str):
         self.symbol = symbol.upper()
         self.taker_fee: float = 0.002
         self.maker_fee: float = 0.0016
-        self.base_asset = None
-        self.quote_asset = None
-
-    def setMarket(self, exchange: Exchange):
-        # make the attributes referenced here properties, because this method is not necessary
-        exchange.load_markets()
-        if self.symbol not in exchange.symbols:
-            raise MarketNotFoundError(f"{self.symbol} market not found on exchange.")
-        market = exchange.market(self.symbol)
-        self.taker_fee: float = market["taker"] if market["taker"] != "" else self.taker_fee
-        self.maker_fee: float = market["maker"] if market["maker"] != "" else self.maker_fee
-        self.base_asset: str = market["base"]
-        self.quote_asset: str = market["quote"]
+        # instead of getting base and quote from an authenticated Exchange object, we deduce it from the symbol itself
+        seperated = seperatePair(self.symbol)
+        self.base_asset = seperated[0]
+        self.quote_asset = seperated[1]
 
 
 class BaseAPI:
@@ -60,7 +52,6 @@ class BaseStrategy:
         self.client = self.api_credentials.authenticateClient()
         self.client.check_required_credentials()
         self.authenticated = True
-        self.market.setMarket(self.client)
         self.name = name
 
     def validate(self):
@@ -131,4 +122,5 @@ class Chart:
 
 
 if __name__ == "__main__":
-    pass
+    x = Market("BTC/USDT")
+    print(x.quote_asset)

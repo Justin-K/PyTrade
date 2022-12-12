@@ -19,15 +19,15 @@ class SimpleSpotStrategy(BaseStrategy):
         super().validate()
         # provide a method to validate that the strategy can run (i.e. check settings validity, account balances, etc.)
         # this method will run once
-        balance_struct = self.client.fetchBalance()
-        if self.market.quote_asset not in balance_struct["free"].keys() or balance_struct["free"][
-            self.market.quote_asset] == 0:
-            raise ValidationException("A validation error has occurred.") \
-                from CurrencyException(f"No {self.market.quote_asset} available to trade.")
-        if self.config.quantity > balance_struct["free"][self.market.quote_asset]:
-            raise ValidationException("A validation error has occurred.") \
-                from BalanceException(
-                f"Designated quantity is larger than the available quantity of {self.market.quote_asset} to trade.")
+        # balance_struct = self.client.fetchBalance()
+        # if self.market.quote_asset not in balance_struct["free"].keys() or balance_struct["free"][
+        #     self.market.quote_asset] == 0:
+        #     raise ValidationException("A validation error has occurred.") \
+        #         from CurrencyException(f"No {self.market.quote_asset} available to trade.")
+        # if self.config.quantity > balance_struct["free"][self.market.quote_asset]:
+        #     raise ValidationException("A validation error has occurred.") \
+        #         from BalanceException(
+        #         f"Designated quantity is larger than the available quantity of {self.market.quote_asset} to trade.")
 
     def tick(self):
         # for this strategy we want to place a buy order, calculate a sell price based on provided params,
