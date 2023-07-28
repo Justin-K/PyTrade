@@ -7,6 +7,7 @@
 - [ ] Validate quantity variable against user balance
 - [ ] Record balances at start (for debugging purposes)
 - [ ] Record current price of security in report
+- [ ] Take another look at the seperatePair() function; it could be simpler
 
 ### Completed
 - [x] 
