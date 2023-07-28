@@ -1,3 +1,0 @@
-ccxt~=1.84.64
-
-python-dateutil~=2.8.2
